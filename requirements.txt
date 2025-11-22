@@ -8,6 +8,7 @@ python-jose
 psycopg2-binary
 pydantic[email]
 email-validator
+pydantic-settings
 jinja2
 openpyxl
 pandas
