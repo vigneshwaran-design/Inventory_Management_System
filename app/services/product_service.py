@@ -1,55 +1,49 @@
 from sqlalchemy.orm import Session
-from app.models import Product
-from app.schema import ProductCreate, ProductUpdate
-from sqlalchemy.orm import joinedload
+from ..models.product_model import Product
+from ..schema.product_schema import ProductCreate, ProductUpdate
+from ..utils.excel_exporter import export_to_excel
 
 class ProductService:
+    
+    def getbyID(db: Session, product_id: int):
+        """Get one product by ID."""
+        return db.query(Product).filter(Product.id == product_id).first()
+    def get_all_products(db: Session):
+        return db.query(Product).all()
 
-    @staticmethod
-    def create(db: Session, data: ProductCreate):
+    def create_product(db: Session, data: ProductCreate):
         product = Product(**data.dict())
         db.add(product)
         db.commit()
         db.refresh(product)
         return product
 
-    @staticmethod
-    def get_all(db: Session):
-        return db.query(Product).all()
-
-    @staticmethod
-    def get(db: Session, product_id: int):
-     print("product_id", product_id)
-     return (
-        db.query(Product)
-        .options(
-            joinedload(Product.category),
-            joinedload(Product.supplier)
-        )
-        .filter(Product.Product_ID == product_id)
-        .first()
-    )
-
-
-    @staticmethod
-    def update(db: Session, product_id: int, data: ProductUpdate):
-        product = db.query(Product).filter(Product.Product_ID == product_id).first()
+    def update_product(db: Session, product_id: int, data: ProductUpdate):
+        product = db.query(Product).filter(Product.id == product_id).first()
         if not product:
             return None
 
-        for field, value in data.dict(exclude_unset=True).items():
-            setattr(product, field, value)
+        for key, value in data.dict(exclude_unset=True).items():
+            setattr(product, key, value)
 
         db.commit()
         db.refresh(product)
         return product
 
-    @staticmethod
-    def delete(db: Session, product_id: int):
-        product = db.query(Product).filter(Product.Product_ID == product_id).first()
-        if not product:
-            return False
+    def delete_product(db: Session, product_id: int):
+        product = db.query(Product).filter(Product.id == product_id).first()
+        if product:
+            db.delete(product)
+            db.commit()
+        return product
+    
+    def export_low_stock(db: Session):
+        low_stock = db.query(Product).filter(Product.quantity < 10).all()
 
-        db.delete(product)
-        db.commit()
-        return True
+        headers = ["ID", "Product_Code", "Name", "Quantity", "Category"]
+        rows = [
+            [p.id, p.product_code, p.name, p.quantity, p.category.name if p.category else ""]
+            for p in low_stock
+        ]
+
+        return export_to_excel(headers, rows)

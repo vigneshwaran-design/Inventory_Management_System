@@ -1,0 +1,26 @@
+{% extends "layout.html" %} {% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Categories</h2>
+
+  <table class="table table-bordered table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Category Name</th>
+        <th>Description</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in categories %}
+      <tr>
+        <td>{{ c.Category_ID }}</td>
+        <td>{{ c.Category_Name }}</td>
+        <td>{{ c.Description }}</td>
+        <td>{{ c.Created_At.strftime("%Y-%m-%d") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

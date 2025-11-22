@@ -1,9 +1,4 @@
-from .product import ProductCreate, ProductUpdate, ProductResponse
-from .category import CategoryCreate, CategoryUpdate, CategoryResponse
-from .supplier import SupplierCreate, SupplierUpdate, SupplierResponse
-
-__all__ = [
-    "ProductCreate", "ProductUpdate", "ProductResponse",
-    "CategoryCreate", "CategoryUpdate", "CategoryResponse",
-    "SupplierCreate", "SupplierUpdate", "SupplierResponse"
-]
+from .user_schema import *
+from .category_schema import *
+from .supplier_schema import *
+from .product_schema import *

@@ -1,17 +1,28 @@
 from fastapi import FastAPI
-from app.database import engine, Base
-from app.routes import product_router, category_router, supplier_router
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
-app = FastAPI(title="Inventory Management")
+from .routes import auth, products, categories, suppliers,sales
+from .config import settings
 
-# create tables on startup (for simple deployments)
-Base.metadata.create_all(bind=engine)
+app = FastAPI(title="Inventory Management System")
 
-# include routers
-app.include_router(product_router)
-app.include_router(category_router)
-app.include_router(supplier_router)
+# Serve Static Files
+# app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# Jinja Templates
+templates = Jinja2Templates(directory="app/templates")
+
+
+
+# Routers
+app.include_router(auth.router, prefix="/auth", tags=["Auth"])
+app.include_router(products.router, prefix="/products", tags=["Products"])
+app.include_router(categories.router, prefix="/categories", tags=["Categories"])
+app.include_router(suppliers.router, prefix="/suppliers", tags=["Suppliers"])
+app.include_router(sales.router)
 
 @app.get("/")
-def root():
-    return {"status": "ok"}
+def dashboard():
+    return {"message": "Inventory API Running"}

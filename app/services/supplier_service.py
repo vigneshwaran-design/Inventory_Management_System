@@ -1,28 +1,25 @@
 from sqlalchemy.orm import Session
-from app.models import Supplier
-from app.schema import SupplierCreate, SupplierUpdate
+from ..models.supplier_model import Supplier
+from ..schema.supplier_schema import SupplierCreate
+from ..utils.excel_exporter import export_to_excel
 
 class SupplierService:
+    def get_all_suppliers(db: Session):
+        return db.query(Supplier).all()
 
-    @staticmethod
-    def create(db: Session, data: SupplierCreate):
+    def create_supplier(db: Session, data: SupplierCreate):
         supplier = Supplier(**data.dict())
         db.add(supplier)
         db.commit()
         db.refresh(supplier)
         return supplier
+   
+    def export_suppliers(db: Session):
+        suppliers = db.query(Supplier).all()
 
-    @staticmethod
-    def get_all(db: Session):
-        return db.query(Supplier).all()
+        headers = ["ID", "Name", "Email", "Phone"]
+        rows = [
+            [s.id, s.name, s.email, s.phone] for s in suppliers
+        ]
 
-    @staticmethod
-    def update(db: Session, id: int, data: SupplierUpdate):
-        supplier = db.query(Supplier).filter(Supplier.Supplier_ID == id).first()
-        if not supplier:
-            return None
-        for field, value in data.dict(exclude_unset=True).items():
-            setattr(supplier, field, value)
-        db.commit()
-        db.refresh(supplier)
-        return supplier
+        return export_to_excel(headers, rows)
