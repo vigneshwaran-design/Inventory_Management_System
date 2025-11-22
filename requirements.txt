@@ -5,6 +5,9 @@ python-dotenv
 passlib[bcrypt]
 python-multipart
 python-jose
-pydantic
-jinja2
 psycopg2-binary
+pydantic[email]
+email-validator
+jinja2
+openpyxl
+pandas
